@@ -16,4 +16,5 @@ async def anti_flood(*args, **kwargs):
 
 if __name__ == "__main__":
     from handlers import dp, sand_to_admin
+    import games.spin.handlers
     executor.start_polling(dp, on_startup=sand_to_admin)

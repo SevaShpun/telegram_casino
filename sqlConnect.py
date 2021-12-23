@@ -54,4 +54,15 @@ def update_balance(user_id, count):
     u = (update(users).where(users.c.user_id == user_id).values(balance=count_balance + count))
     conn.execute(u)
 
+
+def update_count_game(user_id):
+    s = select([users]).where(users.c.user_id == user_id)
+    count_game = conn.execute(s).fetchall()[0][4]
+    u = (update(users).where(users.c.user_id == user_id).values(count_game=count_game + 1))
+    conn.execute(u)
+
+
+def get_user_balance(user_id):
+    s = select([users]).where(users.c.user_id == user_id)
+    return conn.execute(s).fetchall()[0][3]
 # metadata.create_all(engine)
