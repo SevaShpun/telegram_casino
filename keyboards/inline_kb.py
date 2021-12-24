@@ -4,7 +4,7 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 inline_menu_kb = InlineKeyboardMarkup()
 
 inline_menu_btn_spin = InlineKeyboardButton('Играть в рулетку (Beta)', callback_data='spin')
-inline_menu_btn_invite = InlineKeyboardButton('Приглосить друга', callback_data='invite')
+inline_menu_btn_invite = InlineKeyboardButton('Пригласить друга', callback_data='invite')
 inline_menu_btn_out = InlineKeyboardButton('Вывести средства', callback_data='out')
 
 inline_menu_kb.add(inline_menu_btn_spin)
