@@ -32,13 +32,17 @@ def start_game(user_id, color):
     if color == 'spin_green' and win_numb == 0:
         return [True, bet*14 - bet, str(win_numb) + ' ' + colors_list[0]]
 
-    if color == 'spin_red' and win_numb % 2:
+    if color == 'spin_red' and 0 < win_numb < 8:
         return [True, bet, str(win_numb) + ' ' + colors_list[2]]
 
-    if color == 'spin_black' and not win_numb % 2 and win_numb != 0:
+    if color == 'spin_black' and win_numb > 7:
         return [True, bet, str(win_numb) + ' ' + colors_list[1]]
 
-    win_color = 0 if win_numb == 0 else win_numb % 2 + 1
+    win_color = 0
+    if 0 < win_numb < 8:
+        win_color = 2
+    if win_numb > 7:
+        win_color = 1
     return [False, bet, str(win_numb) + ' ' + colors_list[win_color]]
 
 
