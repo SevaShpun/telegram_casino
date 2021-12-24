@@ -59,12 +59,14 @@ async def start_(callback_query: CallbackQuery):
 
     message = message.format(result_game[-1], result_game[1] * 2 if result_game[0] else result_game[1],
                              spin.user_bet.get(str(user_id), 10), balance)
-    with open(f"./games/spin/assets/gif/{result_game[-1].split()[0]}.gif", 'rb') as gif:
-        anim_id = await bot.send_animation(chat_id=user_id, animation=gif)
-    bet_status[str(user_id)] = True
-    await sleep(7)
-    bet_status[str(user_id)] = False
-    await bot.delete_message(chat_id=user_id, message_id=anim_id.message_id)
-
+    with open(f"./games/spin/assets/video/{result_game[-1].split()[0]}.mp4", 'rb') as gif:
+        try:
+            anim_id = await bot.send_video(chat_id=user_id, video=gif)
+            bet_status[str(user_id)] = True
+            await sleep(7.5)
+            bet_status[str(user_id)] = False
+            await bot.delete_message(chat_id=user_id, message_id=anim_id.message_id)
+        except Exception as ex:
+            print(ex)
     return await bot.edit_message_text(chat_id=user_id, message_id=callback_query.message.message_id,
                                        text=message, reply_markup=kb_il.inline_spin_kb)
