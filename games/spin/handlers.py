@@ -7,6 +7,9 @@ import games.spin.spin as spin
 from asyncio import sleep
 
 
+bet_status = {}
+
+
 @dp.callback_query_handler(lambda x: x.data == 'spin')
 @dp.throttled(anti_flood, rate=1)
 async def spin_btn(callback_query: CallbackQuery):
@@ -33,6 +36,8 @@ async def update_bet_spin_btn(callback_query: CallbackQuery):
 @dp.throttled(anti_flood, rate=1)
 async def start_(callback_query: CallbackQuery):
     user_id = callback_query.from_user.id
+    if bet_status.get(str(user_id), False):
+        return
     balance = sqlConnect.get_user_balance(user_id)
 
     if balance < spin.user_bet.get(str(user_id), 10):
@@ -56,8 +61,9 @@ async def start_(callback_query: CallbackQuery):
                              spin.user_bet.get(str(user_id), 10), balance)
     with open(f"./games/spin/assets/gif/{result_game[-1].split()[0]}.gif", 'rb') as gif:
         anim_id = await bot.send_animation(chat_id=user_id, animation=gif)
-
+    bet_status[str(user_id)] = True
     await sleep(7)
+    bet_status[str(user_id)] = False
     await bot.delete_message(chat_id=user_id, message_id=anim_id.message_id)
 
     return await bot.edit_message_text(chat_id=user_id, message_id=callback_query.message.message_id,
