@@ -98,6 +98,13 @@ def add_dep(user_id, cash):
     s = session.query(User).filter_by(user_id=user_id).first()
     old_balance = s.balance
     old_deposit = s.deposit
+    user_ref = s.ref
+    if int(user_ref) != 0:
+        sel = session.query(User).filter_by(user_id=user_ref).first()
+        ref_old_balance = sel.balance
+        upd = update(User).where(User.user_id == user_ref).values(balance=ref_old_balance + cash // 10)\
+            .execution_options(synchronize_session="fetch")
+        session.execute(upd)
     u = update(User).where(User.user_id == user_id).values(balance=old_balance + cash,
                                                            deposit=old_deposit + cash). \
         execution_options(synchronize_session="fetch")
