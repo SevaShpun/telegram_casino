@@ -24,22 +24,20 @@ async def start_message(message: Message):
     if sqlConnect.exist_user(int(message.from_user.id)):
         await bot.send_message(message.from_user.id, msg.exist_user_start)
         return await get_menu_back(message.from_user.id)
+
     ref = message.text.split()[1] if len(message.text.split()) > 1 else 0
+
     if str(ref).isdigit() and ref != 0:
         if sqlConnect.exist_user(int(ref)):
             sqlConnect.add_new_user(int(message.from_user.id), int(ref), balance=500)
             sqlConnect.update_balance(int(ref), 100)
             await bot.send_message(message.from_user.id, text=msg.new_user_on_ref)
             return await get_menu_back(message.from_user.id)
+
     sqlConnect.add_new_user(int(message.from_user.id), 0, balance=250)
+
     await bot.send_message(message.from_user.id, text=msg.new_user_no_ref)
     return await get_menu_back(message.from_user.id)
-
-
-@dp.message_handler(commands=['refka'])
-@dp.throttled(anti_flood, rate=3)
-async def get_ref(message: Message):
-    return await bot.send_message(message.from_user.id, text=msg.ref_text + str(message.from_user.id))
 
 
 @dp.message_handler(commands=['menu'])

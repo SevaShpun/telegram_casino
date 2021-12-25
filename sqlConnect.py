@@ -16,18 +16,22 @@ class User(Base):
 
     user_id = Column(Integer, nullable=False)
     ref = Column(Integer, nullable=False)
-    balance = Column(Integer, default=0)
-    count_game = Column(Integer, default=0)
+    balance = Column(Integer, default=0, nullable=False)
+    count_game = Column(Integer, default=0, nullable=False)
+    deposit = Column(Integer, default=0, nullable=False)
+    out = Column(Integer, default=0, nullable=False)
 
-    def __init__(self, user_id, ref, balance, count_game=0):
+    def __init__(self, user_id, ref, balance, count_game=0, deposit=0, out=0):
         self.user_id = user_id
         self.ref = ref
         self.balance = balance
         self.count_game = count_game
+        self.deposit = deposit
+        self.out = out
 
     def __repr__(self):
-        return "<User(user_id=%s, ref=%s, balance=%s, count_game=%s)>" % (
-            self.user_id, self.ref, self.balance, self.count_game)
+        return "<User(user_id=%s, ref=%s, balance=%s, count_game=%s, deposit=%s, out0%s)>" % (
+            self.user_id, self.ref, self.balance, self.count_game, self.deposit, self.out)
 
 
 Base.metadata.create_all(engine)
@@ -85,5 +89,18 @@ def update_count_game(user_id):
 
 
 def get_user_balance(user_id):
+    user = session.query(User).filter_by(user_id=user_id).first()
+    balance = user.balance
+    return balance
+
+
+def add_dep(user_id, cash):
     s = session.query(User).filter_by(user_id=user_id).first()
-    return s.balance
+    old_balance = s.balance
+    old_deposit = s.deposit
+    u = update(User).where(User.user_id == user_id).values(balance=old_balance + cash,
+                                                           deposit=old_deposit + cash). \
+        execution_options(synchronize_session="fetch")
+    session.execute(u)
+    session.commit()
+    return True
