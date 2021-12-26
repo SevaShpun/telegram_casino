@@ -4,6 +4,7 @@ from config import ADMIN_ID
 import sqlConnect
 import messages.msg as msg
 import keyboards.inline_kb as kb_il
+from render_images.render import main_render
 
 
 message_status = {}
@@ -15,7 +16,7 @@ async def sand_to_admin(dp):
 
 async def get_menu_back(user_id):
     user = sqlConnect.get_user_info(user_id)
-    return await bot.send_message(user_id, text=msg.menu.format(*user), reply_markup=kb_il.inline_menu_kb)
+    return await bot.send_photo(user_id, photo=main_render(user_id, *user), reply_markup=kb_il.inline_menu_kb)
 
 
 @dp.message_handler(commands=['start'])
