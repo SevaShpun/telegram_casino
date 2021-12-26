@@ -1,10 +1,11 @@
 from main import bot, dp, anti_flood
 from aiogram.types.message import ContentType
-from aiogram.types import Message, CallbackQuery, PreCheckoutQuery
+from aiogram.types import Message, CallbackQuery, PreCheckoutQuery, InputMedia, InputFile
 import payments.keyboard.inline as kb
 from payments.tools import send_offer, update_price, price_list
 import payments.messages as msg
 import sqlConnect
+from render_images.render import payments_render
 
 
 @dp.callback_query_handler(lambda x: x.data == 'in')
@@ -12,18 +13,19 @@ import sqlConnect
 async def back_to_menu(callback_query: CallbackQuery):
     user_id = callback_query.from_user.id
     await bot.delete_message(chat_id=user_id, message_id=callback_query.message.message_id)
-    return await bot.send_message(chat_id=user_id,
-                                  text=msg.main.format(price_list.get(str(user_id), 100)),
-                                  reply_markup=kb.inline_kb)
+    return await bot.send_photo(chat_id=user_id,
+                                photo=payments_render(user_id, price_list.get(str(user_id), 100)),
+                                reply_markup=kb.inline_kb)
 
 
 @dp.callback_query_handler(lambda x: x.data in ['up_price', 'down_price'])
 async def change_price(callback_query: CallbackQuery):
     user_id = callback_query.from_user.id
     update_price(user_id, callback_query.data)
-    return await bot.edit_message_text(chat_id=user_id, message_id=callback_query.message.message_id,
-                                       text=msg.main.format(price_list.get(str(user_id), 100)),
-                                       reply_markup=kb.inline_kb)
+    file = InputMedia(media=InputFile(payments_render(user_id, price_list.get(str(user_id), 100))))
+    return await bot.edit_message_media(chat_id=user_id, message_id=callback_query.message.message_id,
+                                        media=file,
+                                        reply_markup=kb.inline_kb)
 
 
 @dp.callback_query_handler(lambda x: x.data == 'get_offer')

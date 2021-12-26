@@ -4,7 +4,6 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, backref, sessionmaker, joinedload
 
 engine = create_engine(config.sql_login)
-print('я отработал')
 
 Base = declarative_base()
 
