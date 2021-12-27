@@ -1,31 +1,28 @@
-from config import spin_config
 import random
 
 user_bet = {}
 
 
 def update_bet(user_id, change):
-    if change == 'spin_up_bet':
+    upd = int(change.split('_')[-1])
+    if change.split('_')[0] == 'up':
         if str(user_id) in user_bet:
-            if user_bet[str(user_id)] != spin_config[-1]:
-                user_bet[str(user_id)] = spin_config[spin_config.index(user_bet[str(user_id)]) + 1]
-            else:
-                user_bet[str(user_id)] = spin_config[0]
+            user_bet[str(user_id)] += upd
         else:
-            user_bet[str(user_id)] = spin_config[1]
-    if change == 'spin_down_bet':
+            user_bet[str(user_id)] = 10 + upd
+    if change.split('_')[0] == 'down':
         if str(user_id) in user_bet:
-            if user_bet[str(user_id)] != spin_config[0]:
-                user_bet[str(user_id)] = spin_config[spin_config.index(user_bet[str(user_id)]) - 1]
+            if user_bet[str(user_id)] - upd < 10:
+                user_bet[str(user_id)] = 10
             else:
-                user_bet[str(user_id)] = spin_config[-1]
+                user_bet[str(user_id)] -= upd
         else:
-            user_bet[str(user_id)] = spin_config[-1]
+            user_bet[str(user_id)] = 10
     return True
 
 
 def start_game(user_id, color):
-    bet = user_bet.get(str(user_id), spin_config[0])
+    bet = user_bet.get(str(user_id), 10)
     colors_list = ['Зеленое', 'Черное', "Красное"]
     win_numb = random.randint(0, 14)
 

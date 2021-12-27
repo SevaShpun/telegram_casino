@@ -19,16 +19,34 @@ async def spin_btn(callback_query: CallbackQuery):
     return await bot.send_photo(user_id, photo=img, reply_markup=kb_il.inline_spin_kb)
 
 
-@dp.callback_query_handler(lambda x: x.data in ['spin_up_bet', 'spin_down_bet'])
+@dp.callback_query_handler(lambda x: x.data in ['up_10', 'up_100', 'up_1000', 'down_10', 'down_100', 'down_1000'])
 async def update_bet_spin_btn(callback_query: CallbackQuery):
     user_id = callback_query.from_user.id
     spin.update_bet(user_id, callback_query.data)
 
     img = spin_render(user_id, sqlConnect.get_user_balance(user_id), spin.user_bet.get(str(user_id), 10), 0)
     file = InputMedia(media=InputFile(img))
+    try:
+        return await bot.edit_message_media(chat_id=user_id, message_id=callback_query.message.message_id,
+                                            media=file, reply_markup=kb_il.inline_spin_kb)
+    except Exception as ex:
+        print(ex)
 
-    return await bot.edit_message_media(chat_id=user_id, message_id=callback_query.message.message_id,
-                                        media=file, reply_markup=kb_il.inline_spin_kb)
+
+@dp.callback_query_handler(lambda x: x.data in ['max_bet', 'min_bet'])
+async def update_bet_spin_btn(callback_query: CallbackQuery):
+    user_id = callback_query.from_user.id
+    balance = sqlConnect.get_user_balance(user_id)
+
+    spin.user_bet[str(user_id)] = balance if callback_query.data.split('_')[0] == 'max' else 10
+
+    img = spin_render(user_id, balance, spin.user_bet.get(str(user_id), 10), 0)
+    file = InputMedia(media=InputFile(img))
+    try:
+        return await bot.edit_message_media(chat_id=user_id, message_id=callback_query.message.message_id,
+                                            media=file, reply_markup=kb_il.inline_spin_kb)
+    except Exception as ex:
+        print(ex)
 
 
 @dp.callback_query_handler(lambda x: x.data in ['spin_red', 'spin_green', 'spin_black'])
