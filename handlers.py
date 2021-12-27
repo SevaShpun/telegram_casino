@@ -44,8 +44,8 @@ async def start_message(message: Message):
 @dp.message_handler(commands=['menu'])
 @dp.throttled(anti_flood, rate=3)
 async def get_menu(message: Message):
-    user = sqlConnect.get_user_info(message.from_user.id)
-    return await bot.send_message(message.from_user.id, text=msg.menu.format(*user), reply_markup=kb_il.inline_menu_kb)
+    user_id = message.from_user.id
+    return await get_menu_back(user_id)
 
 
 # ________________________________________ КНОПКИ ____________________________________________________________

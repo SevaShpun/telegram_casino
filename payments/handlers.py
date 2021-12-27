@@ -3,7 +3,6 @@ from aiogram.types.message import ContentType
 from aiogram.types import Message, CallbackQuery, PreCheckoutQuery, InputMedia, InputFile
 import payments.keyboard.inline as kb
 from payments.tools import send_offer, update_price, price_list
-import payments.messages as msg
 import sqlConnect
 from render_images.render import payments_render
 
@@ -44,4 +43,4 @@ async def process_pre_checkout_query(pre_checkout_query: PreCheckoutQuery):
 async def process_successful_payment(message: Message):
     invoice_payload = message.successful_payment.to_python()['invoice_payload']
     sqlConnect.add_dep(message.from_user.id, int(invoice_payload))
-    return await bot.send_message(chat_id=message.chat.id, text=msg.payment_success.format(invoice_payload))
+    return
