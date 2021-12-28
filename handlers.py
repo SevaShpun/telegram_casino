@@ -1,5 +1,5 @@
 from main import bot, dp, anti_flood
-from aiogram.types import Message, CallbackQuery
+from aiogram.types import Message, CallbackQuery, InputMedia, InputFile
 from config import ADMIN_ID
 import sqlConnect
 import messages.msg as msg
@@ -17,6 +17,13 @@ async def sand_to_admin(dp):
 async def get_menu_back(user_id):
     user = sqlConnect.get_user_info(user_id)
     return await bot.send_photo(user_id, photo=main_render(user_id, *user), reply_markup=kb_il.inline_menu_kb)
+
+
+async def get_menu_btn(user_id, message_id):
+    user = sqlConnect.get_user_info(user_id)
+    file = InputMedia(media=InputFile(main_render(user_id, *user)))
+    return await bot.edit_message_media(chat_id=user_id, message_id=message_id,
+                                        media=file, reply_markup=kb_il.inline_menu_kb)
 
 
 @dp.message_handler(commands=['start'])
@@ -69,8 +76,7 @@ async def out_cash_btn(callback_query: CallbackQuery):
 @dp.throttled(anti_flood, rate=1)
 async def back_to_menu(callback_query: CallbackQuery):
     user_id = callback_query.from_user.id
-    await bot.delete_message(user_id, message_id=callback_query.message.message_id)
-    return await get_menu_back(user_id)
+    return await get_menu_btn(user_id, callback_query.message.message_id)
 
 
 # ________________________________________ END _______________________________________________________________
