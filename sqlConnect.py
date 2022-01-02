@@ -39,34 +39,52 @@ Session = sessionmaker(bind=engine)
 session = Session()
 
 
+def reconnect_db(func):
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except Exception as ex:
+            print(ex)
+            session.rollback()
+    return wrapper
+
+
+@reconnect_db
 def add_new_user(user_id, ref, balance=0):
     s_user = User(user_id=user_id, ref=ref, balance=balance)
     session.add(s_user)
     session.commit()
+    return True
 
 
+@reconnect_db
 def get_all_users():
     s = session.query(User).all()
     return [(i.id, i.user_id, i.ref, i.balance, i.count_game) for i in s]
 
 
+@reconnect_db
 def exist_user(user_id):
     s = session.query(User).filter_by(user_id=user_id).all()
     return bool(len(s))
 
 
+@reconnect_db
 def count_refs(user_id):
     s = session.query(User).filter_by(ref=user_id).all()
     return len(s)
 
 
+@reconnect_db
 def get_user_info(user_id):
+    print(123)
     if not exist_user(user_id):
         return [0, 0, 0]
     user = session.query(User).filter_by(user_id=user_id).first()
     return [user.balance, count_refs(user_id), user.count_game]
 
 
+@reconnect_db
 def update_balance(user_id, count):
     s = session.query(User).filter_by(user_id=user_id).first()
     count_balance = s.balance
@@ -77,6 +95,7 @@ def update_balance(user_id, count):
     return True
 
 
+@reconnect_db
 def update_count_game(user_id):
     s = session.query(User).filter_by(user_id=user_id).first()
     count_game = s.count_game
@@ -87,12 +106,14 @@ def update_count_game(user_id):
     return True
 
 
+@reconnect_db
 def get_user_balance(user_id):
     user = session.query(User).filter_by(user_id=user_id).first()
     balance = user.balance
     return balance
 
 
+@reconnect_db
 def add_dep(user_id, cash):
     s = session.query(User).filter_by(user_id=user_id).first()
     old_balance = s.balance
